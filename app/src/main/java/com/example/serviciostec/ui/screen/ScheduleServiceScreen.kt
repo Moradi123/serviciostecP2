@@ -18,7 +18,7 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun ScheduleServiceScreen(
     navController: NavController,
-    serviceName: String // Recibimos el nombre del servicio
+    serviceName: String
 ) {
     val datePickerState = rememberDatePickerState()
     val timePickerState = rememberTimePickerState()
@@ -49,7 +49,7 @@ fun ScheduleServiceScreen(
 
             DatePicker(
                 state = datePickerState,
-                modifier = Modifier.weight(1f), // Ocupa espacio disponible
+                modifier = Modifier.weight(1f),
                 showModeToggle = false
             )
 
@@ -58,9 +58,7 @@ fun ScheduleServiceScreen(
             Text("2. Selecciona la Hora", style = MaterialTheme.typography.titleMedium)
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Selector de hora (simplificado)
             TimeInput(state = timePickerState)
-
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
@@ -68,7 +66,7 @@ fun ScheduleServiceScreen(
                     val selectedDateMillis = datePickerState.selectedDateMillis
                     if (selectedDateMillis != null) {
                         val date = Instant.ofEpochMilli(selectedDateMillis)
-                            .atZone(ZoneId.systemDefault())
+                            .atZone(ZoneId.of("UTC")) // <--- CAMBIO IMPORTANTE
                             .toLocalDate()
                             .format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
 

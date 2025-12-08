@@ -9,11 +9,13 @@ import androidx.navigation.navArgument
 import com.example.serviciostec.ui.screen.*
 import com.example.serviciostec.viewmodel.FormularioServicioViewModel
 import com.example.serviciostec.viewmodel.UserViewModel
+import com.example.serviciostec.viewmodel.VehiculoViewModel
 
 @Composable
 fun AppNavigation(
     formViewModel: FormularioServicioViewModel,
-    userViewModel: UserViewModel
+    userViewModel: UserViewModel,
+    vehiculoViewModel: VehiculoViewModel
 ) {
     val navController = rememberNavController()
 
@@ -37,6 +39,10 @@ fun AppNavigation(
 
         composable("appointments") {
             AppointmentsScreen(navController, formViewModel)
+        }
+
+        composable("mis_vehiculos") {
+            MisVehiculosScreen(navController, vehiculoViewModel, userViewModel)
         }
 
         composable(

@@ -32,18 +32,17 @@ fun AppointmentsScreen(
     val datePickerState = rememberDatePickerState()
     val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
-    // Lógica de filtrado
     val selectedDateMillis = datePickerState.selectedDateMillis
     val filteredAppointments = if (selectedDateMillis != null) {
         val selectedLocalDate = Instant.ofEpochMilli(selectedDateMillis)
-            .atZone(ZoneId.systemDefault())
+            .atZone(ZoneId.of("UTC"))
             .toLocalDate()
         val selectedDateString = selectedLocalDate.format(dateFormatter)
-        uiState.listaServicios.filter { it.fecha == selectedDateString }
+
+        uiState.listaServicios.filter { it.fecha.startsWith(selectedDateString) }
     } else {
         uiState.listaServicios
     }
-
     Scaffold(
         bottomBar = { BottomNavBar(navController) }
     ) { paddingValues ->
@@ -53,7 +52,6 @@ fun AppointmentsScreen(
                 .padding(paddingValues)
                 .background(Color(0xFFF5F5F5))
         ) {
-            // --- TÍTULO ---
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -70,7 +68,7 @@ fun AppointmentsScreen(
                 )
             }
 
-            // --- CALENDARIO ---
+            // Calendario
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -93,7 +91,7 @@ fun AppointmentsScreen(
                 )
             }
 
-            // --- LISTA DE CITAS ---
+            // Lista de citas
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -132,6 +130,7 @@ fun AppointmentsScreen(
         }
     }
 }
+
 @Composable
 fun AppointmentItem(tipo: String, cliente: String, fecha: String) {
     Card(

@@ -10,5 +10,6 @@ data class FormularioServicioEntity(
     val patente: String,
     val tipoServicio: String,
     val fecha: String,
-    val fotoUri: String? = null
+    val fotoUri: String? = null,
+    val estado: String = "Pendiente"
 )

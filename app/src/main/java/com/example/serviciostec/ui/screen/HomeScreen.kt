@@ -1,12 +1,15 @@
 package com.example.serviciostec.ui.screen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Warning
@@ -44,7 +47,7 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(Color(0xFFF5F5F5)) // Fondo gris claro
+                .background(Color(0xFFF5F5F5))
         ) {
             Box(
                 modifier = Modifier
@@ -61,7 +64,7 @@ fun HomeScreen(
                 )
             }
 
-
+            // Tarjeta de Estado del Vehículo
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -120,6 +123,46 @@ fun HomeScreen(
                     }
                 }
             }
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .offset(y = (-20).dp)
+                    .clickable { navController.navigate("mis_vehiculos") },
+                elevation = CardDefaults.cardElevation(4.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.DirectionsCar,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column {
+                        Text(
+                            text = "Mi Garage",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                        Text(
+                            text = "Administrar mis autos",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
+                    Icon(
+                        imageVector = Icons.Default.ChevronRight,
+                        contentDescription = "Ir",
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
+            }
 
             Text(
                 text = "Historial de Servicios",
@@ -127,7 +170,7 @@ fun HomeScreen(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
-                    .offset(y = (-15).dp)
+                    .offset(y = (-10).dp) // Ajustado el offset
             )
 
             if (historialServicios.isEmpty()) {
@@ -155,7 +198,8 @@ fun HomeScreen(
                         HistoryItemCard(
                             tipo = servicio.tipoServicio,
                             fecha = servicio.fecha,
-                            patente = servicio.patente
+                            patente = servicio.patente,
+                            estado = servicio.estado
                         )
                     }
                     item { Spacer(modifier = Modifier.height(16.dp)) }
@@ -166,7 +210,19 @@ fun HomeScreen(
 }
 
 @Composable
-fun HistoryItemCard(tipo: String, fecha: String, patente: String) {
+fun HistoryItemCard(
+    tipo: String,
+    fecha: String,
+    patente: String,
+    estado: String = "Pendiente"
+) {
+    val (colorFondo, colorTexto) = when (estado) {
+        "Pendiente" -> Pair(Color(0xFFFFF3E0), Color(0xFFEF6C00)) // Naranja
+        "En Proceso" -> Pair(Color(0xFFE3F2FD), Color(0xFF2196F3)) // Azul
+        "Finalizado" -> Pair(Color(0xFFE8F5E9), Color(0xFF4CAF50)) // Verde
+        else -> Pair(Color(0xFFF5F5F5), Color.Gray)
+    }
+
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(2.dp),
@@ -179,13 +235,14 @@ fun HistoryItemCard(tipo: String, fecha: String, patente: String) {
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Icono con fondo de color según el estado
             Box(
                 modifier = Modifier
                     .size(40.dp)
-                    .background(Color(0xFFFFF3E0), shape = RoundedCornerShape(8.dp)),
+                    .background(colorFondo, shape = RoundedCornerShape(8.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Default.History, contentDescription = null, tint = Color(0xFFEF6C00))
+                Icon(Icons.Default.History, contentDescription = null, tint = colorTexto)
             }
 
             Spacer(modifier = Modifier.width(16.dp))
@@ -195,15 +252,17 @@ fun HistoryItemCard(tipo: String, fecha: String, patente: String) {
                 Text(text = "Patente: $patente", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
             }
 
+            // Etiqueta de Estado
             Surface(
-                color = MaterialTheme.colorScheme.primaryContainer,
+                color = colorFondo,
                 shape = RoundedCornerShape(4.dp)
             ) {
                 Text(
-                    text = fecha,
+                    text = estado,
                     style = MaterialTheme.typography.labelSmall,
-                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                    color = colorTexto
                 )
             }
         }

@@ -56,4 +56,18 @@ class UserViewModel(private val repository: UserRepository) : ViewModel() {
     fun logout() {
         _currentUser.value = null
     }
+
+    fun loginWithGoogle(nombre: String, email: String, onSuccess: () -> Unit) {
+        val googleUser = com.example.serviciostec.model.data.entities.UserEntity(
+            nombre = nombre,
+            apellido = "",
+            telefono = "",
+            usuario = email,
+            contrasena = ""
+        )
+
+        _currentUser.value = googleUser
+        _loginError.value = null
+        onSuccess()
+    }
 }

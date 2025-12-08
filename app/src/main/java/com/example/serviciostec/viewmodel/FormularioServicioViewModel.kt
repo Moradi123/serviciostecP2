@@ -50,8 +50,13 @@ class FormularioServicioViewModel(
             }
         }
     }
-
+    fun cambiarEstado(id: Int, nuevoEstado: String) {
+        viewModelScope.launch {
+            repository.actualizarEstado(id, nuevoEstado)
+        }
+    }
     fun resetEstado() {
         _uiState.update { it.copy(guardadoExitoso = false, mensajeError = null) }
     }
+
 }

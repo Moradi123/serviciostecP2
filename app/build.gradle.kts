@@ -41,19 +41,15 @@ android {
 }
 
 dependencies {
-    // Navegación
     implementation("androidx.navigation:navigation-compose:2.7.7")
-    // Base de Datos
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
-
-    // ViewModel
+    implementation("androidx.navigation:navigation-compose:2.7.7")
+    implementation("com.google.android.gms:play-services-auth:21.0.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
-    // Imágenes
     implementation("io.coil-kt:coil-compose:2.6.0")
-    // Iconos extendidos
-    implementation("androidx.compose.material:material-icons-extended:1.6.0")
+    implementation("androidx.compose.material:material-icons-extended:1.6.3")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

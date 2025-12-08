@@ -7,20 +7,23 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.serviciostec.model.data.dao.FormularioServicioDao
 import com.example.serviciostec.model.data.dao.UserDao
+import com.example.serviciostec.model.data.dao.VehiculoDao
 import com.example.serviciostec.model.data.entities.FormularioServicioEntity
 import com.example.serviciostec.model.data.entities.UserEntity
+import com.example.serviciostec.model.data.entities.VehiculoEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Database(
-    entities = [FormularioServicioEntity::class, UserEntity::class],
-    version = 2,
+    entities = [FormularioServicioEntity::class, UserEntity::class, VehiculoEntity::class],
+    version = 4,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun formularioServicioDao(): FormularioServicioDao
-    abstract fun userDao(): UserDao // Agregamos el DAO
+    abstract fun userDao(): UserDao
+    abstract fun vehiculoDao(): VehiculoDao
 
     companion object {
         @Volatile
@@ -44,8 +47,8 @@ abstract class AppDatabase : RoomDatabase() {
                                             nombre = "Administrador",
                                             apellido = "Sistema",
                                             telefono = "+56 9 0000 0000",
-                                            usuario = "admin",
-                                            contrasena = "1234"
+                                            usuario = "admin1",
+                                            contrasena = "12345"
                                         )
                                     )
                                 }

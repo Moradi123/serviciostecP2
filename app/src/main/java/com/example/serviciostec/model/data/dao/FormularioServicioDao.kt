@@ -10,7 +10,9 @@ import kotlinx.coroutines.flow.Flow
 interface FormularioServicioDao {
     @Query("SELECT * FROM servicio_formulario")
     fun obtenerTodos(): Flow<List<FormularioServicioEntity>>
-
     @Insert
     suspend fun insertarServicio(servicio: FormularioServicioEntity)
+
+    @Query("UPDATE servicio_formulario SET estado = :nuevoEstado WHERE id = :id")
+    suspend fun actualizarEstado(id: Int, nuevoEstado: String)
 }
