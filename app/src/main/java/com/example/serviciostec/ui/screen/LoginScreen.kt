@@ -107,7 +107,6 @@ fun LoginScreen(
 
         Spacer(Modifier.height(16.dp))
 
-        // Boton de google
         Button(
             onClick = {
                 val signInIntent = googleSignInClient.signInIntent

@@ -10,12 +10,15 @@ import com.example.serviciostec.ui.screen.*
 import com.example.serviciostec.viewmodel.FormularioServicioViewModel
 import com.example.serviciostec.viewmodel.UserViewModel
 import com.example.serviciostec.viewmodel.VehiculoViewModel
+import com.example.serviciostec.viewmodel.ProductoViewModel
+
 
 @Composable
 fun AppNavigation(
     formViewModel: FormularioServicioViewModel,
     userViewModel: UserViewModel,
-    vehiculoViewModel: VehiculoViewModel
+    vehiculoViewModel: VehiculoViewModel,
+    productoViewModel: ProductoViewModel
 ) {
     val navController = rememberNavController()
 
@@ -30,7 +33,7 @@ fun AppNavigation(
         }
 
         composable("services") {
-            ServicesListScreen(navController)
+            ServicesListScreen(navController, productoViewModel)
         }
 
         composable("profile") {
@@ -43,6 +46,9 @@ fun AppNavigation(
 
         composable("mis_vehiculos") {
             MisVehiculosScreen(navController, vehiculoViewModel, userViewModel)
+        }
+        composable("cart") {
+            CartScreen(navController, productoViewModel)
         }
 
         composable(

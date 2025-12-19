@@ -11,8 +11,8 @@ import kotlinx.coroutines.launch
 
 class UserViewModel(private val repository: UserRepository) : ViewModel() {
 
-    private val _currentUser = MutableStateFlow<UserEntity?>(null)
-    val currentUser: StateFlow<UserEntity?> = _currentUser.asStateFlow()
+    private val _userState = MutableStateFlow<UserEntity?>(null)
+    val userState: StateFlow<UserEntity?> = _userState.asStateFlow()
 
     private val _loginError = MutableStateFlow<String?>(null)
     val loginError: StateFlow<String?> = _loginError.asStateFlow()
@@ -27,7 +27,7 @@ class UserViewModel(private val repository: UserRepository) : ViewModel() {
         viewModelScope.launch {
             val user = repository.login(usuario, contrasena)
             if (user != null) {
-                _currentUser.value = user
+                _userState.value = user
                 _loginError.value = null
                 onSuccess()
             } else {
@@ -36,8 +36,27 @@ class UserViewModel(private val repository: UserRepository) : ViewModel() {
         }
     }
 
+    fun loginWithGoogle(nombre: String, email: String, onSuccess: () -> Unit) {
+        val googleUser = UserEntity(
+            nombre = nombre,
+            apellido = "",
+            telefono = "",
+            usuario = email,
+            contrasena = "",
+            photoUri = null
+        )
+
+        _userState.value = googleUser
+        _loginError.value = null
+        onSuccess()
+    }
+
+    fun logout() {
+        _userState.value = null
+    }
+
     fun updateUser(nombre: String, apellido: String, telefono: String, usuario: String, contrasena: String) {
-        val current = _currentUser.value ?: return
+        val current = _userState.value ?: return
 
         val updatedUser = current.copy(
             nombre = nombre,
@@ -49,25 +68,21 @@ class UserViewModel(private val repository: UserRepository) : ViewModel() {
 
         viewModelScope.launch {
             repository.updateUser(updatedUser)
-            _currentUser.value = updatedUser
+            _userState.value = updatedUser
         }
     }
 
-    fun logout() {
-        _currentUser.value = null
-    }
+    fun actualizarFotoPerfil(userId: Int, uri: String) {
+        viewModelScope.launch {
+            val usuarioActual = repository.obtenerUsuarioPorId(userId)
 
-    fun loginWithGoogle(nombre: String, email: String, onSuccess: () -> Unit) {
-        val googleUser = com.example.serviciostec.model.data.entities.UserEntity(
-            nombre = nombre,
-            apellido = "",
-            telefono = "",
-            usuario = email,
-            contrasena = ""
-        )
+            if (usuarioActual != null) {
+                val usuarioActualizado = usuarioActual.copy(photoUri = uri)
 
-        _currentUser.value = googleUser
-        _loginError.value = null
-        onSuccess()
+                repository.updateUser(usuarioActualizado)
+
+                _userState.value = usuarioActualizado
+            }
+        }
     }
 }

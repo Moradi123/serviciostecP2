@@ -68,7 +68,6 @@ fun AppointmentsScreen(
                 )
             }
 
-            // Calendario
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -91,7 +90,6 @@ fun AppointmentsScreen(
                 )
             }
 
-            // Lista de citas
             Column(
                 modifier = Modifier
                     .fillMaxWidth()

@@ -10,9 +10,9 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue // <--- IMPORTANTE: Para que funcione el 'by'
+import androidx.compose.runtime.getValue
 import androidx.navigation.NavController
-import androidx.navigation.compose.currentBackStackEntryAsState // <--- IMPORTANTE: Para saber en qué pantalla estás
+import androidx.navigation.compose.currentBackStackEntryAsState
 
 @Composable
 fun BottomNavBar(navController: NavController) {

@@ -27,8 +27,9 @@ fun MisVehiculosScreen(
     vehiculoViewModel: VehiculoViewModel,
     userViewModel: UserViewModel
 ) {
-    val currentUser by userViewModel.currentUser.collectAsState()
-    val userId = currentUser?.usuario ?: ""
+    val userState by userViewModel.userState.collectAsState()
+
+    val userId = userState?.usuario ?: ""
 
     val vehiculos by vehiculoViewModel.obtenerVehiculos(userId).collectAsState(initial = emptyList())
 
@@ -80,7 +81,9 @@ fun MisVehiculosScreen(
             AgregarVehiculoDialog(
                 onDismiss = { mostrarDialogo = false },
                 onAdd = { marca, modelo, anio, patente ->
-                    vehiculoViewModel.agregarVehiculo(marca, modelo, anio, patente, userId)
+                    if (userId.isNotEmpty()) {
+                        vehiculoViewModel.agregarVehiculo(marca, modelo, anio, patente, userId)
+                    }
                     mostrarDialogo = false
                 }
             )

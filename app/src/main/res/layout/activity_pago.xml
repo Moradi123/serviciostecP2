@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Resumen del Pedido"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="20dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Total a pagar: $10.000 CLP"
+        android:textSize="18sp"
+        android:layout_marginBottom="40dp"/>
+
+    <Button
+        android:id="@+id/btn_pagar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Pagar con Tarjeta"
+        android:enabled="false"
+        android:backgroundTint="#6200EE"
+        android:textColor="#FFFFFF"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cargando sistema de pago..."
+        android:id="@+id/txt_estado"
+        android:layout_marginTop="10dp"
+        android:textSize="12sp"/>
+
+</LinearLayout>

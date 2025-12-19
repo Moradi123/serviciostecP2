@@ -16,6 +16,9 @@ interface UserDao {
     @Query("SELECT * FROM users WHERE id = :id")
     fun getUserById(id: Int): Flow<UserEntity?>
 
+    @Query("SELECT * FROM users WHERE id = :id")
+    suspend fun obtenerUsuarioPorId(id: Int): UserEntity?
+
     @Query("SELECT COUNT(*) FROM users")
     suspend fun getUserCount(): Int
 

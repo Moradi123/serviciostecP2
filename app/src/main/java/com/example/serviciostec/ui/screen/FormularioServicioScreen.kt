@@ -7,7 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.serviciostec.ui.components.InputText // Asegúrate de usar este import
+import com.example.serviciostec.ui.components.InputText
 import com.example.serviciostec.viewmodel.FormularioServicioViewModel
 import java.time.LocalDate
 
@@ -25,11 +25,10 @@ fun FormularioServicioScreen(
 
     var tipoServicio by remember { mutableStateOf(servicioInicial) }
 
-    // Efecto: Navegar al éxito
     LaunchedEffect(state.guardadoExitoso) {
         if (state.guardadoExitoso) {
             navController.navigate("appointments") {
-                // Limpiamos la pila para que volver atrás no regrese al formulario
+
                 popUpTo("home")
             }
             viewModel.resetEstado()
@@ -40,7 +39,6 @@ fun FormularioServicioScreen(
         Text("Confirmar Reserva", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Tarjeta de Resumen de Fecha
         if (fechaInicial.isNotEmpty()) {
             Card(
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
@@ -60,7 +58,6 @@ fun FormularioServicioScreen(
         InputText(patente, { patente = it }, "Patente Vehículo")
         Spacer(Modifier.height(8.dp))
 
-        // --- CAMBIO AQUÍ: CAMPO FIJO ---
         InputText(
             value = tipoServicio,
             onValueChange = {

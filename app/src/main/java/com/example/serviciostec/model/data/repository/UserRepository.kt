@@ -14,6 +14,9 @@ class UserRepository(private val userDao: UserDao) {
         return userDao.getUserById(id)
     }
 
+    suspend fun obtenerUsuarioPorId(id: Int): UserEntity? {
+        return userDao.obtenerUsuarioPorId(id)
+    }
     suspend fun updateUser(user: UserEntity) {
         userDao.updateUser(user)
     }

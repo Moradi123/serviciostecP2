@@ -30,7 +30,6 @@ fun ServiceCard(
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Icono con fondo suave
             Box(
                 modifier = Modifier
                     .size(40.dp)
