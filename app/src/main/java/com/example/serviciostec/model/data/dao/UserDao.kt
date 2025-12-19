@@ -13,6 +13,9 @@ interface UserDao {
     @Query("SELECT * FROM users WHERE usuario = :usuario AND contrasena = :contrasena LIMIT 1")
     suspend fun login(usuario: String, contrasena: String): UserEntity?
 
+    @Query("SELECT * FROM users WHERE usuario = :usuario LIMIT 1")
+    suspend fun obtenerPorUsuario(usuario: String): UserEntity?
+
     @Query("SELECT * FROM users WHERE id = :id")
     fun getUserById(id: Int): Flow<UserEntity?>
 

@@ -10,12 +10,12 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface VehiculoDao {
-    @Query("SELECT * FROM vehiculos WHERE usuarioId = :usuarioId")
-    fun obtenerVehiculosPorUsuario(usuarioId: String): Flow<List<VehiculoEntity>>
+    @Query("SELECT * FROM vehiculos")
+    fun getAllVehiculos(): Flow<List<VehiculoEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertarVehiculo(vehiculo: VehiculoEntity)
+    suspend fun insertVehiculo(vehiculo: VehiculoEntity)
 
     @Delete
-    suspend fun eliminarVehiculo(vehiculo: VehiculoEntity)
+    suspend fun deleteVehiculo(vehiculo: VehiculoEntity)
 }

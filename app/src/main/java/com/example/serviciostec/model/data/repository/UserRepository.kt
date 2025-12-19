@@ -17,6 +17,7 @@ class UserRepository(private val userDao: UserDao) {
     suspend fun obtenerUsuarioPorId(id: Int): UserEntity? {
         return userDao.obtenerUsuarioPorId(id)
     }
+
     suspend fun updateUser(user: UserEntity) {
         userDao.updateUser(user)
     }
@@ -29,9 +30,26 @@ class UserRepository(private val userDao: UserDao) {
                     apellido = "Sistema",
                     telefono = "+56 9 0000 0000",
                     usuario = "admin",
-                    contrasena = "1234"
+                    contrasena = "1234",
+                    rol = "admin"
                 )
             )
+        }
+    }
+
+    suspend fun ensureMechanicExists() {
+        val existingUser = userDao.obtenerPorUsuario("mecanico@taller.cl")
+
+        if (existingUser == null) {
+            val mecanico = UserEntity(
+                nombre = "Mecánico",
+                apellido = "Jefe",
+                telefono = "999999999",
+                usuario = "mecanico@taller.cl",
+                contrasena = "mecanico123",
+                rol = "mecanico"
+            )
+            userDao.insertUser(mecanico)
         }
     }
 }

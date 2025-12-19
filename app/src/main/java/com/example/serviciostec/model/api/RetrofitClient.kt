@@ -6,7 +6,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 object RetrofitClient {
     // Si uso emulador: 10.0.2.2
     // Si uso celular real por USB:  la IP PC (ej: 192.168.1.X)
-    private const val BASE_URL = "http://10.0.2.2:8081/"
+    private const val BASE_URL = "http://192.168.1.84:8081/"
 
     val service: ProductoApiService by lazy {
         Retrofit.Builder()

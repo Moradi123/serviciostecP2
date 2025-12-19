@@ -11,5 +11,5 @@ data class UserEntity(
     val telefono: String,
     val usuario: String,
     val contrasena: String,
-    val photoUri: String? = null
-)
+    val photoUri: String? = null,
+    val rol: String = "cliente")

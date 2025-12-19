@@ -58,5 +58,9 @@ class FormularioServicioViewModel(
     fun resetEstado() {
         _uiState.update { it.copy(guardadoExitoso = false, mensajeError = null) }
     }
-
+    fun eliminarCita(cita: FormularioServicioEntity) {
+        viewModelScope.launch {
+            repository.eliminarServicio(cita)
+        }
+    }
 }

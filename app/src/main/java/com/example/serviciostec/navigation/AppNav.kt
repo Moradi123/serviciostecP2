@@ -1,5 +1,6 @@
 package com.example.serviciostec.navigation
 
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -8,10 +9,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.serviciostec.ui.screen.*
 import com.example.serviciostec.viewmodel.FormularioServicioViewModel
+import com.example.serviciostec.viewmodel.ProductoViewModel
 import com.example.serviciostec.viewmodel.UserViewModel
 import com.example.serviciostec.viewmodel.VehiculoViewModel
-import com.example.serviciostec.viewmodel.ProductoViewModel
-
 
 @Composable
 fun AppNavigation(
@@ -41,16 +41,16 @@ fun AppNavigation(
         }
 
         composable("appointments") {
-            AppointmentsScreen(navController, formViewModel)
+            AppointmentsScreen(navController, formViewModel, userViewModel)
         }
 
         composable("mis_vehiculos") {
-            MisVehiculosScreen(navController, vehiculoViewModel, userViewModel)
+            MisVehiculosScreen(navController, vehiculoViewModel)
         }
+
         composable("cart") {
             CartScreen(navController, productoViewModel)
         }
-
         composable(
             route = "agendar_fecha/{serviceName}",
             arguments = listOf(navArgument("serviceName") { type = NavType.StringType })
@@ -75,6 +75,10 @@ fun AppNavigation(
                 servicioInicial = serviceName,
                 fechaInicial = fecha
             )
+        }
+
+        composable("vehiculo_form") {
+            Text("Pantalla de Formulario en Construcción")
         }
 
         composable("agendar_servicio") {

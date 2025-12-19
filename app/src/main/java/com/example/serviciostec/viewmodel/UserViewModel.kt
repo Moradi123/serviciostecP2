@@ -14,12 +14,15 @@ class UserViewModel(private val repository: UserRepository) : ViewModel() {
     private val _userState = MutableStateFlow<UserEntity?>(null)
     val userState: StateFlow<UserEntity?> = _userState.asStateFlow()
 
+    val currentUser: StateFlow<UserEntity?> = _userState.asStateFlow()
+
     private val _loginError = MutableStateFlow<String?>(null)
     val loginError: StateFlow<String?> = _loginError.asStateFlow()
 
     init {
         viewModelScope.launch {
             repository.ensureAdminExists()
+            repository.ensureMechanicExists()
         }
     }
 
@@ -43,7 +46,8 @@ class UserViewModel(private val repository: UserRepository) : ViewModel() {
             telefono = "",
             usuario = email,
             contrasena = "",
-            photoUri = null
+            photoUri = null,
+            rol = "cliente"
         )
 
         _userState.value = googleUser
@@ -78,9 +82,7 @@ class UserViewModel(private val repository: UserRepository) : ViewModel() {
 
             if (usuarioActual != null) {
                 val usuarioActualizado = usuarioActual.copy(photoUri = uri)
-
                 repository.updateUser(usuarioActualizado)
-
                 _userState.value = usuarioActualizado
             }
         }

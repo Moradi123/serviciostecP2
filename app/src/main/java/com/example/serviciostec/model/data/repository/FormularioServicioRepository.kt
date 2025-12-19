@@ -12,4 +12,7 @@ class FormularioServicioRepository(private val dao: FormularioServicioDao) {
     suspend fun actualizarEstado(id: Int, nuevoEstado: String) {
         dao.actualizarEstado(id, nuevoEstado)
     }
+    suspend fun eliminarServicio(servicio: FormularioServicioEntity) {
+        dao.eliminarServicio(servicio)
+    }
 }

@@ -1,9 +1,14 @@
 package com.example.serviciostec.ui.screen
 
+import android.Manifest
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.net.Uri
+import android.provider.MediaStore
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -14,13 +19,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Call
-import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.ExitToApp
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -32,10 +31,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.serviciostec.model.data.entities.UserEntity
 import com.example.serviciostec.viewmodel.UserViewModel
+import java.io.ByteArrayOutputStream
 
 @Composable
 fun ProfileScreen(
@@ -44,32 +45,34 @@ fun ProfileScreen(
 ) {
     val userState by userViewModel.userState.collectAsState()
     val context = LocalContext.current
-
     var showEditDialog by remember { mutableStateOf(false) }
 
-    val photoPickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia()
-    ) { uri: Uri? ->
-        if (uri != null && userState != null) {
-            val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
-            try {
-                context.contentResolver.takePersistableUriPermission(uri, flag)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview()
+    ) { bitmap ->
+        if (bitmap != null && userState != null) {
+            val uri = getImageUriFromBitmap(context, bitmap)
             userViewModel.actualizarFotoPerfil(userState!!.id, uri.toString())
         }
     }
 
-    Scaffold(
-        bottomBar = {}
-    ) { paddingValues ->
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            cameraLauncher.launch(null)
+        } else {
+            Toast.makeText(context, "Se requiere permiso de cámara", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    Scaffold(bottomBar = {}) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(Color(0xFFF5F5F5))
-                .verticalScroll(rememberScrollState()), // Hacemos scrollable la pantalla
+                .background(MaterialTheme.colorScheme.background)
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
@@ -81,6 +84,16 @@ fun ProfileScreen(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Box(contentAlignment = Alignment.BottomEnd) {
+
+                        val openCamera = {
+                            val permission = Manifest.permission.CAMERA
+                            if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED) {
+                                cameraLauncher.launch(null)
+                            } else {
+                                permissionLauncher.launch(permission)
+                            }
+                        }
+
                         if (userState?.photoUri != null) {
                             Image(
                                 painter = rememberAsyncImagePainter(userState!!.photoUri),
@@ -88,7 +101,8 @@ fun ProfileScreen(
                                 modifier = Modifier
                                     .size(120.dp)
                                     .clip(CircleShape)
-                                    .border(4.dp, Color.White, CircleShape),
+                                    .border(4.dp, MaterialTheme.colorScheme.onPrimary, CircleShape)
+                                    .clickable { openCamera() },
                                 contentScale = ContentScale.Crop
                             )
                         } else {
@@ -98,50 +112,47 @@ fun ProfileScreen(
                                 modifier = Modifier
                                     .size(120.dp)
                                     .clip(CircleShape)
-                                    .background(Color.White)
-                                    .padding(16.dp),
+                                    .background(MaterialTheme.colorScheme.surface)
+                                    .padding(16.dp)
+                                    .clickable { openCamera() },
                                 tint = Color.Gray
                             )
                         }
+
                         SmallFloatingActionButton(
-                            onClick = {
-                                photoPickerLauncher.launch(
-                                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                                )
-                            },
+                            onClick = { openCamera() },
                             containerColor = MaterialTheme.colorScheme.secondary,
                             modifier = Modifier.size(40.dp)
                         ) {
-                            Icon(Icons.Default.CameraAlt, contentDescription = "Cambiar Foto", tint = Color.White)
+                            Icon(Icons.Default.CameraAlt, contentDescription = "Tomar Foto", tint = MaterialTheme.colorScheme.onPrimary)
                         }
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = userState?.nombre ?: "Usuario",
+                        text = "${userState?.nombre} ${userState?.apellido}",
                         style = MaterialTheme.typography.headlineSmall,
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
                         text = userState?.usuario ?: "Sin Email",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White.copy(alpha = 0.8f)
+                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
+                    )
+                    Text(
+                        text = userState?.rol?.uppercase() ?: "CLIENTE",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color(0xFFFFC107),
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }
-
             Spacer(modifier = Modifier.height(24.dp))
-
-            Text(
-                "Centro de Ayuda",
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(start = 16.dp, bottom = 8.dp).align(Alignment.Start)
-            )
 
             Card(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(2.dp)
             ) {
                 Column {
@@ -157,14 +168,12 @@ fun ProfileScreen(
                         }
                         try { context.startActivity(intent) } catch (e: Exception) {}
                     }
-
                     Divider(color = Color.LightGray.copy(alpha = 0.2f))
                     SupportItem(Icons.Default.Edit, "Modificar Perfil") {
                         showEditDialog = true
                     }
                 }
             }
-
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
@@ -172,12 +181,12 @@ fun ProfileScreen(
                     userViewModel.logout()
                     navController.navigate("login") { popUpTo(0) }
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F)),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
                 modifier = Modifier.padding(16.dp).fillMaxWidth().height(50.dp)
             ) {
-                Icon(Icons.Default.ExitToApp, contentDescription = null)
+                Icon(Icons.Default.ExitToApp, contentDescription = null, tint = MaterialTheme.colorScheme.onError)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Cerrar Sesión")
+                Text("Cerrar Sesión", color = MaterialTheme.colorScheme.onError)
             }
         }
 
@@ -194,20 +203,25 @@ fun ProfileScreen(
     }
 }
 
+fun getImageUriFromBitmap(context: Context, bitmap: Bitmap): Uri {
+    val bytes = ByteArrayOutputStream()
+    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
+    val path = MediaStore.Images.Media.insertImage(context.contentResolver, bitmap, "Perfil_${System.currentTimeMillis()}", null)
+    return Uri.parse(path)
+}
+
 @Composable
 fun EditProfileDialog(
     user: UserEntity,
     onDismiss: () -> Unit,
     onSave: (String, String, String, String, String) -> Unit
 ) {
-    // Estados inicializados con los datos actuales
     var nombre by remember { mutableStateOf(user.nombre) }
     var apellido by remember { mutableStateOf(user.apellido) }
     var telefono by remember { mutableStateOf(user.telefono) }
     var usuario by remember { mutableStateOf(user.usuario) }
     var pass by remember { mutableStateOf(user.contrasena) }
     var confirmPass by remember { mutableStateOf(user.contrasena) }
-
     var errorMsg by remember { mutableStateOf<String?>(null) }
 
     AlertDialog(
@@ -218,71 +232,31 @@ fun EditProfileDialog(
                 modifier = Modifier.verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                OutlinedTextField(
-                    value = nombre, onValueChange = { nombre = it },
-                    label = { Text("Nombre") }, modifier = Modifier.fillMaxWidth()
-                )
-                OutlinedTextField(
-                    value = apellido, onValueChange = { apellido = it },
-                    label = { Text("Apellido") }, modifier = Modifier.fillMaxWidth()
-                )
-                OutlinedTextField(
-                    value = telefono, onValueChange = { telefono = it },
-                    label = { Text("Teléfono") }, modifier = Modifier.fillMaxWidth()
-                )
-                OutlinedTextField(
-                    value = usuario, onValueChange = { usuario = it },
-                    label = { Text("Usuario / Email") }, modifier = Modifier.fillMaxWidth()
-                )
-
-                Divider(modifier = Modifier.padding(vertical = 8.dp))
-                Text("Seguridad", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
-
-                OutlinedTextField(
-                    value = pass, onValueChange = { pass = it },
-                    label = { Text("Contraseña") },
-                    visualTransformation = PasswordVisualTransformation(),
-                    modifier = Modifier.fillMaxWidth()
-                )
-                OutlinedTextField(
-                    value = confirmPass, onValueChange = { confirmPass = it },
-                    label = { Text("Confirmar Contraseña") },
-                    visualTransformation = PasswordVisualTransformation(),
-                    isError = errorMsg != null,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                if (errorMsg != null) {
-                    Text(text = errorMsg!!, color = Color.Red, style = MaterialTheme.typography.bodySmall)
-                }
+                OutlinedTextField(value = nombre, onValueChange = { nombre = it }, label = { Text("Nombre") })
+                OutlinedTextField(value = apellido, onValueChange = { apellido = it }, label = { Text("Apellido") })
+                OutlinedTextField(value = telefono, onValueChange = { telefono = it }, label = { Text("Teléfono") })
+                OutlinedTextField(value = usuario, onValueChange = { usuario = it }, label = { Text("Usuario / Email") })
+                Divider()
+                OutlinedTextField(value = pass, onValueChange = { pass = it }, label = { Text("Nueva Contraseña") }, visualTransformation = PasswordVisualTransformation())
+                OutlinedTextField(value = confirmPass, onValueChange = { confirmPass = it }, label = { Text("Confirmar Contraseña") }, visualTransformation = PasswordVisualTransformation(), isError = errorMsg != null)
+                if (errorMsg != null) Text(errorMsg!!, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
             }
         },
         confirmButton = {
             Button(onClick = {
-                if (pass.isEmpty()) {
-                    errorMsg = "La contraseña no puede estar vacía"
-                } else if (pass != confirmPass) {
-                    errorMsg = "Las contraseñas no coinciden"
-                } else {
-                    onSave(nombre, apellido, telefono, usuario, pass)
-                }
-            }) {
-                Text("Guardar Cambios")
-            }
+                if (pass.isEmpty()) errorMsg = "La contraseña no puede estar vacía"
+                else if (pass != confirmPass) errorMsg = "Las contraseñas no coinciden"
+                else onSave(nombre, apellido, telefono, usuario, pass)
+            }) { Text("Guardar") }
         },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancelar") }
-        }
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancelar") } }
     )
 }
 
 @Composable
 fun SupportItem(icon: androidx.compose.ui.graphics.vector.ImageVector, text: String, onClick: () -> Unit) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(16.dp),
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)

@@ -3,6 +3,10 @@ package com.example.serviciostec
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.serviciostec.model.data.config.AppDatabase
@@ -10,26 +14,20 @@ import com.example.serviciostec.model.data.repository.FormularioServicioReposito
 import com.example.serviciostec.model.data.repository.ProductoRepository
 import com.example.serviciostec.model.data.repository.UserRepository
 import com.example.serviciostec.navigation.AppNavigation
-import com.example.serviciostec.viewmodel.FormularioServicioViewModel
-import com.example.serviciostec.viewmodel.HomeViewModelFactory
-import com.example.serviciostec.viewmodel.ProductoViewModel
-import com.example.serviciostec.viewmodel.UserViewModel
-import com.example.serviciostec.viewmodel.VehiculoViewModel
+import com.example.serviciostec.ui.theme.ServiciosTecTheme
+import com.example.serviciostec.viewmodel.*
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val db = AppDatabase.getDatabase(applicationContext)
-
         val vehiculoDao = db.vehiculoDao()
         val productoDao = db.productoDao()
 
         val formRepository = FormularioServicioRepository(db.formularioServicioDao())
         val userRepository = UserRepository(db.userDao())
-
         val productoRepository = ProductoRepository(productoDao)
-
 
         val factory = HomeViewModelFactory(formRepository, userRepository)
         val formViewModel = ViewModelProvider(this, factory)[FormularioServicioViewModel::class.java]
@@ -50,12 +48,19 @@ class MainActivity : ComponentActivity() {
         })[ProductoViewModel::class.java]
 
         setContent {
-            AppNavigation(
-                formViewModel = formViewModel,
-                userViewModel = userViewModel,
-                vehiculoViewModel = vehiculoViewModel,
-                productoViewModel = productoViewModel
-            )
+            ServiciosTecTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    AppNavigation(
+                        formViewModel = formViewModel,
+                        userViewModel = userViewModel,
+                        vehiculoViewModel = vehiculoViewModel,
+                        productoViewModel = productoViewModel
+                    )
+                }
+            }
         }
     }
 }

@@ -55,7 +55,7 @@ class PagoActivity : AppCompatActivity() {
 
 
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:8181/")
+            .baseUrl("http://192.168.1.84:8181/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
