@@ -1,5 +1,11 @@
 package com.example.serviciostec.ui.screen
 
+import android.app.Activity
+import android.content.Intent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
+import com.example.serviciostec.PagoActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,9 +26,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.serviciostec.viewmodel.ProductoViewModel
 import com.example.serviciostec.model.domain.CartItem
-import android.content.Intent
-import androidx.compose.ui.platform.LocalContext
-import com.example.serviciostec.PagoActivity
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CartScreen(
@@ -31,8 +34,15 @@ fun CartScreen(
 ) {
     val carrito: List<CartItem> by viewModel.carrito.collectAsState()
     val total by viewModel.totalPagar.collectAsState()
-
     val context = LocalContext.current
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            viewModel.limpiarCarrito()
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -71,7 +81,7 @@ fun CartScreen(
                         Button(
                             onClick = {
                                 val intent = Intent(context, PagoActivity::class.java)
-                                context.startActivity(intent)
+                                launcher.launch(intent)
                             },
                             modifier = Modifier.fillMaxWidth().height(50.dp)
                         ) {
@@ -127,7 +137,6 @@ fun CartItemCard(item: CartItem, viewModel: ProductoViewModel) {
                     Icon(Icons.Default.Remove, contentDescription = "Restar", tint = Color.Red)
                 }
 
-                // Cantidad
                 Text(
                     text = item.cantidad.toString(),
                     fontWeight = FontWeight.Bold,

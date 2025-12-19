@@ -81,12 +81,27 @@ class PagoActivity : AppCompatActivity() {
 
     private fun presentarPago() {
         paymentIntentClientSecret?.let { secret ->
-            paymentSheet.presentWithPaymentIntent(
-                secret,
-                PaymentSheet.Configuration(
-                    merchantDisplayName = "Servicios Tec",
+            try {
+                if (secret.isBlank()) {
+                    Toast.makeText(this, "Error: ClientSecret vacío", Toast.LENGTH_LONG).show()
+                    return
+                }
+
+                println("Intentando abrir Stripe con secreto: $secret")
+
+                paymentSheet.presentWithPaymentIntent(
+                    secret,
+                    PaymentSheet.Configuration(
+                        merchantDisplayName = "Servicios Tec",
+                        allowsDelayedPaymentMethods = true
+                    )
                 )
-            )
+            } catch (e: Exception) {
+                Toast.makeText(this, "Crash: ${e.message}", Toast.LENGTH_LONG).show()
+                e.printStackTrace()
+            }
+        } ?: run {
+            Toast.makeText(this, "Error: No hay código de pago (ClientSecret es null)", Toast.LENGTH_LONG).show()
         }
     }
 
@@ -101,7 +116,8 @@ class PagoActivity : AppCompatActivity() {
             }
             is PaymentSheetResult.Completed -> {
                 Toast.makeText(this, "¡Pago Exitoso!", Toast.LENGTH_LONG).show()
-                txtEstado.text = "Pago completado"
+                setResult(RESULT_OK)
+                finish()
             }
         }
     }
